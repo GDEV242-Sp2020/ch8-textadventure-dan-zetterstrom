@@ -34,30 +34,36 @@ public class Game
      */
     private void createRooms()
     {
-        Room outside, theater, pub, lab, office;
+        Room frontYard, foyer;
       
         // create the rooms
-        outside = new Room("outside the main entrance of the university");
-        theater = new Room("in a lecture theater");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
+        String[] frontYardFirstDesc = {"You find yourself outside the large structure,",
+        "the still smoldering wreck of your ship at your back.",
+        "You look around and see a large set of doors in front",
+        "of you. You can make out a sign that reads \"Labeller Mansion\".",
+        "Unfortunately for you, you can't read, but perhaps",
+        "the locals find it useful."};
+        
+        String[] foyerFirstDesc = {"You approach the structure but halt just before",
+        "the doors. You peer through the window and see",
+        "several of the locals dressed in formal wear.",
+        "You can't go in there looking like you do!",
+        "You do what anyone from your planet would do and",
+        "transform into your best approximation of a native.",
+        "Confident in your looks, you walk through the doors",
+        "and find another sign on the wall that reads \"Grand Foyer\".",
+        "Again, you're not sure what it means but maybe",
+        "someone finds it useful."};
+        
+        frontYard = new Room(frontYardFirstDesc, "outside of the \"Labeller Mansion\", in the front yard.");
+        foyer = new Room(foyerFirstDesc, "inside, in the Grand Foyer.");
+        
+        frontYard.setExit("north", foyer);
+        foyer.setExit("south", frontYard);
         
         // initialise room exits
-        outside.setExit("east", theater);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
 
-        theater.setExit("west", outside);
-
-        pub.setExit("east", outside);
-
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
-
-        office.setExit("west", lab);
-
-        currentRoom = outside;  // start game outside
+        currentRoom = frontYard;  // start game outside
     }
 
     /**
@@ -84,11 +90,16 @@ public class Game
     private void printWelcome()
     {
         System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
-        System.out.println("Type '" + CommandWord.HELP + "' if you need help.");
+        System.out.println("Oh No! It appears your spaceship is out of control!");
+        System.out.println("You knew you shouldn't have wandered so close to that");
+        System.out.println("planet. You couldn't help getting a closer look at the");
+        System.out.println("beautiful blue color. Fortunately for you, the steering");
+        System.out.println("isn't completely compromised. You take it down for a soft");
+        System.out.println("crash near what looks to be a living space for the natives.");
+        System.out.println("(Type help for the current command list and look if ");
+        System.out.println("you forget where you are.)");
         System.out.println();
-        System.out.println(currentRoom.getLongDescription());
+        currentRoom.visitRoom();
     }
 
     /**
@@ -118,6 +129,10 @@ public class Game
             case QUIT:
                 wantToQuit = quit(command);
                 break;
+             
+            case LOOK:
+                System.out.println(currentRoom.getReturnDescription());
+                break;
         }
         return wantToQuit;
     }
@@ -131,9 +146,6 @@ public class Game
      */
     private void printHelp() 
     {
-        System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
-        System.out.println();
         System.out.println("Your command words are:");
         parser.showCommands();
     }
@@ -160,7 +172,7 @@ public class Game
         }
         else {
             currentRoom = nextRoom;
-            System.out.println(currentRoom.getLongDescription());
+            currentRoom.visitRoom();
         }
     }
 

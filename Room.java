@@ -1,6 +1,7 @@
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Class Room - a room in an adventure game.
@@ -18,18 +19,22 @@ import java.util.Iterator;
 
 public class Room 
 {
-    private String description;
+    private String[] firstDescription;
+    private String returnDescription;
+    private boolean beenVisited = false;         // keeps track of if the room has been visited.
     private HashMap<String, Room> exits;        // stores exits of this room.
 
     /**
      * Create a room described "description". Initially, it has
      * no exits. "description" is something like "a kitchen" or
      * "an open court yard".
-     * @param description The room's description.
+     * @param firstDescription The description that is displayed when entering a room for the first time.
+     * @param returnDescription The description that is displayed when returning to a room
      */
-    public Room(String description) 
+    public Room(String[] firstDescription, String returnDescription) 
     {
-        this.description = description;
+        this.firstDescription = firstDescription;
+        this.returnDescription = returnDescription;
         exits = new HashMap<>();
     }
 
@@ -44,23 +49,24 @@ public class Room
     }
 
     /**
-     * @return The short description of the room
-     * (the one that was defined in the constructor).
-     */
-    public String getShortDescription()
-    {
-        return description;
-    }
-
-    /**
-     * Return a description of the room in the form:
+     * Picks a description starter at random and returns a description of the room in the form:
      *     You are in the kitchen.
      *     Exits: north west
      * @return A long description of this room
      */
-    public String getLongDescription()
+    public String getReturnDescription()
     {
-        return "You are " + description + ".\n" + getExitString();
+        Random rand = new Random();
+        String[] descriptionStarters = {"You are ", "You find yourself ", "You think you're ", "It looks like you're "};
+        
+        return descriptionStarters[rand.nextInt(descriptionStarters.length)]+ returnDescription + ".\n" + getExitString();
+    }
+    
+    private void printFirstDescription()
+    {
+        for(int i = 0; i < firstDescription.length; i++){
+            System.out.println(firstDescription[i]);
+        }
     }
 
     /**
@@ -87,6 +93,16 @@ public class Room
     public Room getExit(String direction) 
     {
         return exits.get(direction);
+    }
+    
+    public void visitRoom(){
+        if(!beenVisited){
+            beenVisited = true;
+            printFirstDescription();
+            System.out.println(getExitString());
+        }else{
+            System.out.println(getReturnDescription());
+        }
     }
 }
 
