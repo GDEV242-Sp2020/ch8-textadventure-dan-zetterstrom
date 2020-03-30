@@ -6,12 +6,11 @@ import java.util.Random;
 /**
  * Class Room - a room in an adventure game.
  *
- * This class is part of the "World of Zuul" application. 
- * "World of Zuul" is a very simple, text based adventure game.  
- *
  * A "Room" represents one location in the scenery of the game.  It is 
  * connected to other rooms via exits.  For each existing exit, the room 
  * stores a reference to the neighboring room.
+ * 
+ * Each room has a first description, a return description, and a smash string
  * 
  * @author  Michael Kölling and David J. Barnes
  * @version 2016.02.29
@@ -23,6 +22,8 @@ public class Room
     private String returnDescription;
     private boolean beenVisited = false;         // keeps track of if the room has been visited.
     private HashMap<String, Room> exits;        // stores exits of this room.
+    private boolean canSmash = false;
+    private String smashString = "";
 
     /**
      * Create a room described "description". Initially, it has
@@ -35,6 +36,32 @@ public class Room
     {
         this.firstDescription = firstDescription;
         this.returnDescription = returnDescription;
+        exits = new HashMap<>();
+    }
+    /**
+     * Overflow constructor that allows setting of a specific smash string upon room initialization
+     * @param firstDescription The description that is displayed when entering a room for the first time.
+     * @param returnDescription The description that is displayed when returning to a room
+     * @param smashString The blurb of text that is displayed when the player uses the smash command in the room
+     */
+    public Room(String[] firstDescription, String returnDescription, String smashString) 
+    {
+        this.firstDescription = firstDescription;
+        this.returnDescription = returnDescription;
+        this.smashString = smashString;
+        exits = new HashMap<>();
+    }
+    /**
+     * Overflow constructor that allows setting of the canSmash global variable for the room
+     * @param firstDescription The description that is displayed when entering a room for the first time.
+     * @param returnDescription The description that is displayed when returning to a room
+     * @param canSmash determines whether or not smash can be used in the room. Set to false in other constructors
+     */
+    public Room(String[] firstDescription, String returnDescription, boolean canSmash)
+    {
+        this.firstDescription = firstDescription;
+        this.returnDescription = returnDescription;
+        this.canSmash = canSmash;
         exits = new HashMap<>();
     }
 
@@ -62,6 +89,9 @@ public class Room
         return descriptionStarters[rand.nextInt(descriptionStarters.length)]+ returnDescription + ".\n" + getExitString();
     }
     
+    /**
+     * Prints out the description that is shown when the player enters the room for the first time
+     */
     private void printFirstDescription()
     {
         for(int i = 0; i < firstDescription.length; i++){
@@ -95,6 +125,9 @@ public class Room
         return exits.get(direction);
     }
     
+    /**
+     * Determines whether or not a room has been visited and prints the correct description
+     */
     public void visitRoom(){
         if(!beenVisited){
             beenVisited = true;
@@ -103,6 +136,60 @@ public class Room
         }else{
             System.out.println(getReturnDescription());
         }
+    }
+    
+    /**
+     * Returns a boolean that determines whether or not the room has been visisted
+     * @return true if the room has been visited, false otherwise
+     */
+    public boolean hasBeenVisited(){
+        if(beenVisited){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Allows setting of the return string
+     * @param newDescription The string that returnDescription will be set to
+     */
+    public void setReturnString(String newDescription){
+        this.returnDescription = newDescription;
+    }
+    /**
+     * Returns smash string
+     * @return Either returns a random string if the global variable smashString has not been set, otherwise smashString is returned
+     */
+    public String getSmashString(){
+        String[] smashStrings = {"You hear a voice in your head \"Ash, now isn\'t the time to use that.\" You are confused...",
+        "You don't think now is the time for that...",
+        "Maybe later...", "Not right now...", "No..."};
+        if(this.smashString.equals("")){
+            Random rand = new Random();
+            return smashStrings[rand.nextInt(smashStrings.length)];
+        }
+        return this.smashString;
+    }
+    /**
+     * Determines whether the smash command can be used in the room
+     * @return value of this.canSmash
+     */
+    public boolean canSmash(){
+        return this.canSmash;
+    }
+    /**
+     * Sets whether or not smash can be used in the oom
+     * @param smash What canSmash should be set to
+     */
+    public void setSmash(boolean smash){
+        this.canSmash = smash;
+    }
+    /**
+     * Sets the smash string
+     * @param newSmashString What smashString should be set to
+     */
+    public void setSmashString(String newSmashString){
+        this.smashString = newSmashString;
     }
 }
 
